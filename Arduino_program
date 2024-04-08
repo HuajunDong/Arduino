@@ -1,0 +1,30 @@
+unsigned long startTime = 0; // 用来存储开始计时的时间
+bool timerStarted = false;   // 标记计时是否开始
+
+void setup() {
+  Serial.begin(9600);  // 初始化串行通信
+  pinMode(3, OUTPUT);  // 设置数字端口3为输出模式
+  Serial.println("Arduino setup() completed. Waiting for 'H' to start timer...");
+
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    char received = Serial.read();
+    // 如果接收到的字符是'H'，且计时未开始，则开始计时
+    if (received == 'H' && !timerStarted) {
+      digitalWrite(3, HIGH); // 设置端口为高电平
+      startTime = millis();  // 记录开始计时的时间
+      timerStarted = true;   // 标记计时开始
+
+       Serial.println("Timer started!");
+    }
+  }
+
+  // 如果计时已开始且已过20秒
+  if (timerStarted && millis() - startTime >= 5000) {
+    digitalWrite(3, LOW); // 将3号端口设置为低电平
+    timerStarted = false;  // 重置计时标记，等待下一次触发
+    Serial.println("Timer stopped after 20 seconds.");
+  }
+}
